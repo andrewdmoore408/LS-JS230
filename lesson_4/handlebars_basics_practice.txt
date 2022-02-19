@@ -1,0 +1,76 @@
+1.
+$( function() {
+    const post = {
+    title: 'Lorem ipsum dolor sit amet',
+    published: 'April 1, 2015',
+    body: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.'
+  };
+
+  const postTemplate = Handlebars.compile($('#post').html());
+  $('#handlebarContent').html(postTemplate(post));
+});
+
+2. To output raw HTML, an additional set of curly braces (Handlebars calls them moustaches) needs to be added to the Handlebars template. The below template will output the string assigned to the property named body in the object passed to the template as-is, including its HTML.
+
+<script id="post" type="text/x-handlebars">
+  <article>
+    <h1>{{title}}</h1>
+    <p><time>Posted on {{published}}</time></p>
+    {{{body}}}
+  </article>
+</script>
+
+3. Using the each helper, we can iterate over an array and use this inside the each to access the current element. The syntax is {{#each <propertyName> }} and then {{/each}} to end the block, as seen below.
+
+<script id="post" type="text/x-handlebars">
+  <article>
+    <h1>{{title}}</h1>
+    <p><time>Posted on {{published}}</time></p>
+    {{{body}}}
+    <br><br>
+    {{#each tags}}
+      <span><em>--{{this}}</em></span>
+    {{/each}}
+  </article>
+</script>
+
+4. 
+<script id="tag" type="text/x-handlebars">
+  <span><em>--{{this}}</em></span>
+</script>
+
+<script id="post" type="text/x-handlebars">
+  <article>
+    <h1>{{title}}</h1>
+    <p><time>Posted on {{published}}</time></p>
+    {{{body}}}
+    <br><br>
+    {{#each tags}}
+      {{> tag}}
+    {{/each}}
+  </article>
+</script>
+
+Handlebars.registerPartial('tag', $('#tag').html());
+
+5. I kept the if/else condition regarding tags being present or not contained within the #tag template--I thought that made sense for better separation of concerns. 
+<script id="tag" type="text/x-handlebars">
+  {{#if tags}}
+    {{#each tags}}
+      <span><em>--{{this}}</em></span>
+    {{/each}}
+  {{else}}
+    <span><em>--Not tagged--</em></span>
+  {{/if}}
+</script>
+<script id="post" type="text/x-handlebars">
+  {{#each posts}}
+  <article>
+      <h1>{{this.title}}</h1>
+      <p><time>Posted on {{this.published}}</time></p>
+      {{{this.body}}}
+      <br><br>
+      {{> tag}}
+  </article>
+  {{/each}}
+</script>
