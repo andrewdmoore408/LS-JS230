@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(response => response.json())
     .then(photosArray => {
       photosArray.forEach(photo => {
+        photo.src = photo.src.replace('placehold.it', 'via.placeholder.com');
         photos.push(Object.create(Photo).init(photo));
       });
 
