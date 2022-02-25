@@ -35,7 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const photos = [];
-  const photosTemplate = Handlebars.compile(document.querySelector('#photos').innerHTML);
+  const templates = {};
+  // const photosTemplate = Handlebars.compile(document.querySelector('#photos').innerHTML);
+
+  [...document.querySelectorAll("script[type='text/x-handlebars']")].filter(element => !element.dataset.type).forEach(tmpl => {
+    templates[tmpl.id] = Handlebars.compile(tmpl.innerHTML);
+  });
+
+  [...document.querySelectorAll('script[type="text/x-handlebars"]')].filter(element => element.dataset.type === 'partial').forEach(tmpl => {
+    templates[tmpl.id] = Handlebars.registerPartial(tmpl.id, tmpl.innerHTML);
+  });
 
   fetch('/photos')
     .then(response => response.json())
@@ -44,9 +53,16 @@ document.addEventListener('DOMContentLoaded', () => {
         photos.push(Object.create(Photo).init(photo));
       });
 
-      document.querySelector('#slides').innerHTML = photosTemplate({photos: photos});
+      document.querySelector('#slides').innerHTML = templates.photos({photos: photos});
 
       const photoInformationTemplate = Handlebars.compile(document.querySelector('#photo_information').innerHTML);
       document.querySelector('section > header').innerHTML = photoInformationTemplate(photos[0]);
+
+      fetch(`comments?photo_id=${photos[0].id}`)
+        .then(response => response.json())
+        .then(commentsArray => {
+          console.log(`commentsArray: ${commentsArray.forEach(comment => console.log(comment))}`);
+          document.querySelector('#comments > ul').innerHTML = templates.photo_comments({comments: commentsArray});
+        });
     });
 });
