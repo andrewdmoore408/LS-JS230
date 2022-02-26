@@ -13,37 +13,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  function attachSlideshowControls() {
-    document.querySelector('a.prev').addEventListener('click', prev);
-    document.querySelector('a.next').addEventListener('click', next);
+  function getFigureElementForActivePhoto() {
+    return document.querySelector(`#slides > figure[data-id="${activePhoto.id}"]`);
+  }
 
-    function next(event) {
+  function attachSlideshowControls() {
+    document.querySelector('a.prev').addEventListener('click', prevHandler);
+    document.querySelector('a.next').addEventListener('click', nextHandler);
+
+    function nextHandler(event) {
       event.preventDefault();
 
-      let activeIndex = photos.findIndex(photo => photo === activePhoto);
+      const activeFigureElement = getFigureElementForActivePhoto();
 
-      activeIndex = (activeIndex === photos.length - 1) ? 0 : activeIndex += 1;
+      const activeIndex = photos.findIndex(photo => photo === activePhoto);
+      const nextIndex = (activeIndex === photos.length - 1) ? 0 : activeIndex + 1;
+      activePhoto = photos[nextIndex];
 
-      activePhoto = photos[activeIndex];
+      const nextFigureElement = getFigureElementForActivePhoto();
+      document.querySelector('#slides').insertAdjacentElement('afterbegin', nextFigureElement);
 
-      const activePhotoElement = document.querySelector(`#slides > figure[data-id="${activePhoto.id}"]`);
-      document.querySelector('#slides').insertAdjacentElement('afterbegin', activePhotoElement);
+      activeFigureElement.classList.remove('active');
+      nextFigureElement.classList.add('active');
 
       renderActivePhotoInfo();
       renderActivePhotoComments();
     }
 
-    function prev(event) {
+    function prevHandler(event) {
       event.preventDefault();
 
-      let activeIndex = photos.findIndex(photo => photo === activePhoto);
+      const activeFigureElement = getFigureElementForActivePhoto();
+
+      const activeIndex = photos.findIndex(photo => photo === activePhoto);
       const precedingIndex = (activeIndex === 0) ? photos.length - 1 : activeIndex - 1;
-      const precedingPhoto = photos[precedingIndex];
+      activePhoto = photos[precedingIndex];
 
-      const precedingPhotoElement = document.querySelector(`#slides > figure[data-id="${precedingPhoto.id}"]`);
-      document.querySelector('#slides').insertAdjacentElement('afterbegin', precedingPhotoElement);
+      const precedingFigureElement = getFigureElementForActivePhoto();
+      document.querySelector('#slides').insertAdjacentElement('afterbegin', precedingFigureElement);
 
-      activePhoto = precedingPhoto;
+      activeFigureElement.classList.remove('active');
+      precedingFigureElement.classList.add('active');
 
       renderActivePhotoInfo();
       renderActivePhotoComments();
